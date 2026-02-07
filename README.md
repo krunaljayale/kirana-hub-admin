@@ -68,6 +68,8 @@ kirana-hub/
 ├── public/                 # Static assets (images, icons)
 ├── tailwind.config.ts      # Tailwind configuration
 └── postcss.config.mjs      # PostCSS configuration
+```
+
 
 ---
 
