@@ -8,20 +8,6 @@
 
 ---
 
-## 📸 Screenshots
-
-| **Landing Page (Public)** | **Admin Dashboard** |
-|:---:|:---:|
-| ![Landing Page](./public/landing-preview.png) | ![Dashboard](./public/dashboard-preview.png) |
-| *Futuristic "Clarid" Design* | *Analytics & KPI Overview* |
-
-| **Live Orders (Kanban)** | **Order History (Table)** |
-|:---:|:---:|
-| ![Live Orders](./public/orders-kanban.png) | ![Order History](./public/orders-table.png) |
-| *Real-time Kitchen View* | *Data Table with CSV Export* |
-
----
-
 ## 🚀 Key Features
 
 ### 1. 🌐 Public Landing Page
