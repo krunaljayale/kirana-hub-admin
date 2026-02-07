@@ -68,3 +68,20 @@ kirana-hub/
 ├── public/                 # Static assets (images, icons)
 ├── tailwind.config.ts      # Tailwind configuration
 └── postcss.config.mjs      # PostCSS configuration
+
+---
+
+🗺️ Roadmap
+[✓] Project Setup & Theming: Dark mode, Sidebar, Layouts.
+
+[✓] Dashboard: KPI Cards, Charts, Delivery Widget.
+
+[✓] Orders: Live Kanban Board & History Table with Export.
+
+[ ] Inventory: Product management (Add/Edit/Delete) & Image Upload.
+
+[ ] Customers: Customer CRM and purchase history.
+
+[ ] Backend: Integration with Supabase/Firebase for real database persistence.
+
+[ ] Auth: Clerk or NextAuth integration.
