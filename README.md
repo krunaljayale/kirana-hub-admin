@@ -73,7 +73,7 @@ kirana-hub/
 
 ---
 
-🗺️ Roadmap
+### 🗺️ Roadmap
 [✓] Project Setup & Theming: Dark mode, Sidebar, Layouts.
 
 [✓] Dashboard: KPI Cards, Charts, Delivery Widget.
