@@ -88,8 +88,6 @@ kirana-hub/
 
 [✓] Settings: Store profile, Toggle switches, Security. (Completed Today)
 
-[ ] Dashboard: KPI Cards, Revenue Charts, Recent Activity. (Planned for Tomorrow)
-
 [ ] Backend: Integration with Supabase/Firebase for real database persistence.
 
 [ ] Auth: Clerk or NextAuth integration.
