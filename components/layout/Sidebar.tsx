@@ -22,7 +22,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { name: "Dashboard", path: "/dashboard", icon: HomeIcon },
   { name: "Live Orders", path: "/orders", icon: ShoppingBagIcon },
-  { name: "Inventory", path: "/products", icon: ChartBarIcon },
+  { name: "Inventory", path: "/inventory", icon: ChartBarIcon },
   { name: "Customers", path: "/customers", icon: UsersIcon },
   { name: "Delivery", path: "/delivery", icon: TruckIcon },
   { name: "Settings", path: "/settings", icon: Cog6ToothIcon },
