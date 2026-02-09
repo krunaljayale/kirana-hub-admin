@@ -80,11 +80,16 @@ kirana-hub/
 
 [✓] Orders: Live Kanban Board & History Table with Export.
 
-[ ] Inventory: Product management (Add/Edit/Delete) & Image Upload.
+[✓] Inventory: Product management (Add/Edit/Delete) & Image Upload. (Completed Today)
 
-[ ] Customers: Customer CRM and purchase history.
+[✓] Customers: Customer CRM and purchase history. (Completed Today)
+
+[✓] Delivery: Runner tracking & Live Map. (Completed Today)
+
+[✓] Settings: Store profile, Toggle switches, Security. (Completed Today)
+
+[ ] Dashboard: KPI Cards, Revenue Charts, Recent Activity. (Planned for Tomorrow)
 
 [ ] Backend: Integration with Supabase/Firebase for real database persistence.
 
 [ ] Auth: Clerk or NextAuth integration.
->>>>>>> c32eaeb3444ce53e5c8eb72feaec2665ec3f5b4b
