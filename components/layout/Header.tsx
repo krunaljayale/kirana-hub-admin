@@ -20,7 +20,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 flex h-20 w-full items-center justify-between border-b border-slate-200 bg-white/80 px-6 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80 transition-colors duration-300">
+    <header className="sticky top-0 z-20 flex h-20 w-full items-center justify-between border-b border-slate-200 bg-white px-6 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900 transition-colors ease-in-out duration-300">
       
       <div className="flex items-center gap-4">
         {/* --- NEW: Hamburger Menu (Mobile Only) --- */}
