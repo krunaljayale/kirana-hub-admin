@@ -74,20 +74,20 @@ kirana-hub/
 ---
 
 ### 🗺️ Roadmap
-[✓] Project Setup & Theming: Dark mode, Sidebar, Layouts.
+- [x] Project Setup & Theming: Dark mode, Sidebar, Layouts.
 
-[✓] Dashboard: KPI Cards, Charts, Delivery Widget.
+- [x] Dashboard: KPI Cards, Charts, Delivery Widget.
 
-[✓] Orders: Live Kanban Board & History Table with Export.
+- [x] Orders: Live Kanban Board & History Table with Export.
 
-[✓] Inventory: Product management (Add/Edit/Delete) & Image Upload. (Completed Today)
+- [x] Inventory: Product management (Add/Edit/Delete) & Image Upload. (Completed Today)
 
-[✓] Customers: Customer CRM and purchase history. (Completed Today)
+- [x] Customers: Customer CRM and purchase history. (Completed Today)
 
-[✓] Delivery: Runner tracking & Live Map. (Completed Today)
+- [x] Delivery: Runner tracking & Live Map. (Completed Today)
 
-[✓] Settings: Store profile, Toggle switches, Security. (Completed Today)
+- [x] Settings: Store profile, Toggle switches, Security. (Completed Today)
 
-[ ] Backend: Integration with Supabase/Firebase for real database persistence.
+- [ ] Backend: Integration with Supabase/Firebase for real database persistence.
 
-[ ] Auth: Clerk or NextAuth integration.
+- [ ] Auth: Clerk or NextAuth integration.
