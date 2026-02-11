@@ -24,65 +24,55 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setMounted(true);
   }, []);
 
-  // 2. The Global Logic (Runs on EVERY page)
+  // 2. The Global Logic (Syncs State with DOM)
   useEffect(() => {
+    // Only run on client
     if (!mounted) return;
 
     const root = document.documentElement;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = () => {
-      // A. INJECT GLOBAL TRANSITION STYLE
-      // This forces every element (sidebar, cards, text) to morph smoothly
-      const style = document.createElement('style');
-      style.id = 'theme-transition-style';
-      style.innerHTML = `
-        *, *::before, *::after {
-          transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease-in-out !important;
-        }
-      `;
-      // Prevent duplicate tags
-      if (!document.getElementById('theme-transition-style')) {
-        document.head.appendChild(style);
-      }
-
-      // B. DETERMINE DARK MODE
       const isDark = 
         theme === 'dark' || 
         (theme === 'system' && mediaQuery.matches);
 
-      // C. APPLY CLASS
       if (isDark) {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
       }
-
-      // D. SAVE PREFERENCE
+      
       localStorage.setItem('theme', theme);
-
-      // E. CLEANUP (Remove transition after 300ms)
-      // We remove this so resizing the window later doesn't feel "laggy"
-      setTimeout(() => {
-        const existingStyle = document.getElementById('theme-transition-style');
-        if (existingStyle) existingStyle.remove();
-      }, 300);
     };
 
     applyTheme();
 
-    // Listener for System changes (e.g., Mac auto-switch at sunset)
+    // Listener for System changes
     if (theme === 'system') {
       mediaQuery.addEventListener('change', applyTheme);
+      return () => mediaQuery.removeEventListener('change', applyTheme);
     }
-
-    return () => {
-      mediaQuery.removeEventListener('change', applyTheme);
-    };
   }, [theme, mounted]);
 
+  // 3. The "Smooth Switch" Wrapper
+  // This ONLY runs when the user manually changes the theme.
+  const changeTheme = (newTheme: ThemeOption) => {
+    // A. Inject a temporary class to force smooth transitions on EVERYTHING
+    document.documentElement.classList.add('transition-colors', 'duration-300', 'ease-in-out');
+    
+    // B. Update the state (triggering the useEffect above)
+    setThemeState(newTheme);
+    
+    // C. Clean up the transition class after the animation finishes
+    // This prevents "laggy" resizing later on
+    setTimeout(() => {
+      document.documentElement.classList.remove('transition-colors', 'duration-300', 'ease-in-out');
+    }, 300);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: setThemeState }}>
+    <ThemeContext.Provider value={{ theme, setTheme: changeTheme }}>
       {children}
     </ThemeContext.Provider>
   );

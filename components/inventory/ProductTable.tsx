@@ -36,9 +36,7 @@ const initialProducts: Product[] = [
     price: 66, 
     stock: 45, 
     unit: "1L", 
-    images: ["https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=1080/da/cms-assets/cms/product/8b6b5194-6eaa-4db2-9257-2d27ad931303.png",
-      "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=1080/da/cms-assets/cms/product/76146d94-e403-432d-897f-86e21ec3180f.png"
-    ] 
+    images: ["https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=1080/da/cms-assets/cms/product/8b6b5194-6eaa-4db2-9257-2d27ad931303.png"] 
   },
   { 
     id: 2, 
@@ -56,7 +54,7 @@ const initialProducts: Product[] = [
     price: 28, 
     stock: 120, 
     unit: "1kg", 
-    images: ["https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=1080/da/cms-assets/cms/product/691b74b3-ba1c-4ffe-ac6a-48a52c67eec6.png"] // No image example
+    images: ["https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=1080/da/cms-assets/cms/product/691b74b3-ba1c-4ffe-ac6a-48a52c67eec6.png"]
   },
 ];
 
@@ -242,16 +240,19 @@ export default function ProductTable() {
 
       {/* --- ADD / EDIT MODAL --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+        // MOBILE FIX: Removing padding on mobile (sm:p-4) and using items-end for mobile sheet effect
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
+          
+          {/* MOBILE FIX: h-full on mobile, rounded-t-2xl instead of rounded-3xl on mobile */}
+          <div className="bg-white dark:bg-slate-900 w-full h-full sm:h-auto sm:max-w-2xl rounded-none sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[100dvh] sm:max-h-[90vh] animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200">
             
             {/* Modal Header */}
-            <div className="px-8 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+            <div className="px-6 py-4 sm:px-8 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 shrink-0">
               <div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                   {editingProduct ? "Edit Product" : "New Product"}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Fill in the details to update your inventory.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Fill in details to update inventory.</p>
               </div>
               <button onClick={() => setIsModalOpen(false)} className="h-8 w-8 rounded-full flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors">
                 <XMarkIcon className="h-5 w-5 text-slate-500" />
@@ -259,15 +260,16 @@ export default function ProductTable() {
             </div>
 
             {/* Scrollable Form */}
-            <div className="px-8 py-2 overflow-y-auto custom-scrollbar flex-1">
-              <form id="productForm" onSubmit={handleSave} className="space-y-8 pb-32">
+            {/* MOBILE FIX: px-4 on mobile instead of px-8 to save space */}
+            <div className="px-4 sm:px-8 py-4 overflow-y-auto custom-scrollbar flex-1">
+              <form id="productForm" onSubmit={handleSave} className="space-y-6 sm:space-y-8 pb-32">
                 
                 {/* Image Upload */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Product Images</label>
                   <div className="flex flex-wrap gap-4">
                     {formData.images.map((img, idx) => (
-                      <div key={idx} className="relative h-24 w-24 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden group shadow-sm">
+                      <div key={idx} className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden group shadow-sm">
                         <img src={img} alt="preview" className="h-full w-full object-cover" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button 
@@ -280,17 +282,17 @@ export default function ProductTable() {
                         </div>
                       </div>
                     ))}
-                    <label className="h-24 w-24 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer transition-all group">
+                    <label className="h-20 w-20 sm:h-24 sm:w-24 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer transition-all group">
                       <PhotoIcon className="h-6 w-6 text-slate-400 group-hover:text-indigo-500 transition-colors" />
-                      <span className="text-[10px] text-slate-500 font-bold mt-2 group-hover:text-indigo-600">Add Image</span>
+                      <span className="text-[10px] text-slate-500 font-bold mt-2 group-hover:text-indigo-600 hidden sm:block">Add Image</span>
                       <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
                     </label>
                   </div>
                 </div>
 
                 {/* Form Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="col-span-1 md:col-span-2">
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Product Name</label>
                     <input 
                       required
@@ -322,25 +324,31 @@ export default function ProductTable() {
                     />
                   </div>
 
+                  {/* ZERO PRICE FIX: Added Conditional Value */}
                   <div className="relative z-0">
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price (₹)</label>
                     <input 
                       required
                       type="number" 
-                      value={formData.price}
-                      onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                      // FIX: If price is 0, show empty string so placeholder shows
+                      value={formData.price === 0 ? "" : formData.price}
+                      onChange={(e) => setFormData({...formData, price: e.target.value === "" ? 0 : Number(e.target.value)})}
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                      placeholder="0"
                     />
                   </div>
 
+                  {/* ZERO STOCK FIX: Added Conditional Value */}
                   <div className="relative z-0">
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Stock Qty</label>
                     <input 
                       required
                       type="number" 
-                      value={formData.stock}
-                      onChange={(e) => setFormData({...formData, stock: Number(e.target.value)})}
+                      // FIX: If stock is 0, show empty string
+                      value={formData.stock === 0 ? "" : formData.stock}
+                      onChange={(e) => setFormData({...formData, stock: e.target.value === "" ? 0 : Number(e.target.value)})}
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                      placeholder="0"
                     />
                   </div>
 
@@ -349,7 +357,7 @@ export default function ProductTable() {
             </div>
 
             {/* Footer Buttons */}
-            <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex gap-4 z-50 relative">
+            <div className="p-4 sm:p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex gap-4 z-50 relative shrink-0">
               <button onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors shadow-sm">
                 Cancel
               </button>
@@ -385,7 +393,7 @@ export default function ProductTable() {
       )}
 
       {/* --- TOOLBAR --- */}
-      <div className="p-5 flex flex-col xl:flex-row gap-4 justify-between items-center border-b border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-900">
+      <div className="p-5 flex flex-col xl:flex-row gap-4 justify-between items-center border-b border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-900 shrink-0">
         
         {/* Search & Filter Group */}
         <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
@@ -421,7 +429,7 @@ export default function ProductTable() {
       </div>
 
       {/* --- CONTENT AREA --- */}
-      <div className="flex-1 bg-slate-50 dark:bg-slate-900/50">
+      <div className="flex-1 bg-slate-50 dark:bg-slate-900/50 overflow-y-auto">
         
         {/* === MOBILE CARD VIEW (Visible on Small Screens) === */}
         <div className="md:hidden grid grid-cols-1 gap-4 p-4">

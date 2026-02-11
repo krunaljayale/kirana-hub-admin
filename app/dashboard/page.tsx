@@ -1,5 +1,6 @@
 import KpiCard from "@/components/ui/KpiCard";
 import SalesChart from "@/components/charts/SalesChart";
+import { motion } from "motion/react"
 
 import { 
   ShoppingBagIcon, 
@@ -10,8 +11,7 @@ import {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8 ">
-      
+    <div className="space-y-8">
       {/* 1. Page Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -22,9 +22,6 @@ export default function DashboardPage() {
             Welcome back, Admin 👋
           </p>
         </div>
-        <button className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
-          + Add New Product
-        </button>
       </div>
 
       {/* 2. Top Stats (White Cards) */}

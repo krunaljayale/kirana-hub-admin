@@ -14,12 +14,13 @@ export default function RootLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname(); 
-  const isLandingPage = pathname === "/";
+// Hide layout on Landing Page AND Login Page
+  const isFullScreen = pathname === "/" || pathname === "/login";
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* CRITICAL: This script prevents the "White Flash" on reload */}
+        {/* CRITICAL FIX: Now handles 'system' value correctly */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -27,7 +28,12 @@ export default function RootLayout({
                 try {
                   var saved = localStorage.getItem('theme');
                   var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (saved === 'dark' || (!saved && sys)) {
+                  
+                  // LOGIC FIX:
+                  // 1. If saved is 'dark' -> DARK
+                  // 2. If saved is 'system' AND OS is dark -> DARK
+                  // 3. If saved is null (first visit) AND OS is dark -> DARK
+                  if (saved === 'dark' || ((saved === 'system' || !saved) && sys)) {
                     document.documentElement.classList.add('dark');
                   } else {
                     document.documentElement.classList.remove('dark');
@@ -38,21 +44,25 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden ${isLandingPage ? 'block' : 'flex'}`}>
+      
+      {/* Body with smooth background transition */}
+      <body className={`flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden transition-colors duration-300 ease-in-out ${isFullScreen ? 'block' : 'flex'}`}>
         
         <ThemeProvider>
           
-          {!isLandingPage && (
+          {!isFullScreen && (
             <Sidebar mobileOpen={sidebarOpen} setMobileOpen={setSidebarOpen} />
           )}
 
-          <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${!isLandingPage ? 'lg:ml-72' : ''}`}>
+          {/* Main Content Wrapper */}
+          <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${!isFullScreen ? 'lg:ml-72' : ''}`}>
             
-            {!isLandingPage && (
+            {!isFullScreen && (
               <Header onMenuClick={() => setSidebarOpen(true)} />
             )}
             
-            <main className={`bg-slate-50 dark:bg-slate-900 flex-1 ${!isLandingPage ? 'overflow-y-auto p-4 md:p-8' : 'overflow-auto'}`}>
+            {/* Page Content */}
+            <main className={`bg-slate-50 dark:bg-slate-900 flex-1 transition-colors duration-300 ease-in-out ${!isFullScreen ? 'overflow-y-auto p-4 md:p-8' : 'overflow-auto'}`}>
               {children}
             </main>
           </div>
