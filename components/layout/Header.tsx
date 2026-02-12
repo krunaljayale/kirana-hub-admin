@@ -38,6 +38,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // ✅ Added Loading State
   
   // Notification State
   const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
@@ -77,26 +78,30 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   };
 
   const deleteNotification = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // Prevent triggering navigation
+    e.stopPropagation(); 
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  // ✅ NEW: Handle Click & Navigate
   const handleNotificationClick = (item: Notification) => {
-    // 1. Mark as read
     setNotifications(prev => prev.map(n => n.id === item.id ? { ...n, read: true } : n));
-    
-    // 2. Close Dropdown
     setShowNotifications(false);
 
-    // 3. Navigate based on type
     if (item.type === 'order') {
       router.push('/orders');
     } else if (item.type === 'alert') {
       router.push('/inventory');
-    } else if (item.type === 'system') {
-      // Optional: Redirect to settings or changelog
-      // router.push('/settings'); 
+    }
+  };
+
+  // ✅ NEW: LOGOUT LOGIC
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/logout", { method: "POST" });
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed", error);
+      setIsLoggingOut(false);
     }
   };
 
@@ -160,16 +165,11 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
             className={`relative rounded-full p-2 transition-colors duration-300 ${showNotifications ? 'bg-slate-100 dark:bg-slate-800 text-indigo-500' : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}
           >
             <BellIcon className="h-6 w-6" />
-            {/* Dynamic Red Dot */}
             {unreadCount > 0 && (
               <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-900 transition-transform duration-300 animate-pulse"></span>
             )}
           </button>
 
-          {/* ✅ MOBILE FIX: 
-              Using 'fixed' on mobile ensures it centers on screen (left-4 right-4).
-              Using 'absolute' on desktop (sm:) places it normally under the bell.
-          */}
           <div className={`
             fixed left-4 right-4 top-20 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 
             sm:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 
@@ -177,7 +177,6 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
             ${showNotifications ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}
           `}>
             
-            {/* Header */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
               <h3 className="font-semibold text-slate-900 dark:text-white">Notifications</h3>
               {unreadCount > 0 ? (
@@ -189,7 +188,6 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
               )}
             </div>
 
-            {/* List */}
             <div className="max-h-[60vh] sm:max-h-[22rem] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
                {notifications.length === 0 ? (
                  <div className="flex flex-col items-center justify-center py-10 text-slate-400">
@@ -200,19 +198,17 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                  notifications.map((item) => (
                    <div 
                      key={item.id} 
-                     onClick={() => handleNotificationClick(item)} // ✅ Navigate on Click
+                     onClick={() => handleNotificationClick(item)} 
                      className={`
                        relative p-4 border-b border-slate-50 dark:border-slate-700/50 cursor-pointer transition-colors duration-200 group
                        ${item.read ? 'bg-white dark:bg-slate-800 opacity-60 hover:opacity-100' : 'bg-indigo-50/30 dark:bg-indigo-900/10 hover:bg-slate-50 dark:hover:bg-slate-700'}
                      `}
                    >
-                     {/* Blue Dot for Unread */}
                      {!item.read && (
                        <span className="absolute top-4 right-4 h-2 w-2 rounded-full bg-indigo-500"></span>
                      )}
                      
                      <div className="flex gap-3">
-                       {/* Icon based on type */}
                        <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${
                          item.type === 'order' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
                          item.type === 'alert' ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
@@ -232,7 +228,6 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                          </p>
                        </div>
                        
-                       {/* Delete Button (Visible on Hover) */}
                        <button 
                          onClick={(e) => deleteNotification(e, item.id)}
                          className="absolute bottom-4 right-4 p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
@@ -246,7 +241,6 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                )}
             </div>
 
-            {/* Footer */}
             {notifications.length > 0 && (
               <div className="p-3 bg-slate-50 dark:bg-slate-800/50 text-center border-t border-slate-100 dark:border-slate-700">
                 <button 
@@ -306,8 +300,21 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
              </div>
 
              <div className="p-2 border-t border-slate-100 dark:border-slate-700">
-               <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors">
-                 <ArrowRightOnRectangleIcon className="h-4 w-4" /> Logout
+               {/* ✅ LOGOUT BUTTON */}
+               <button 
+                 onClick={handleLogout}
+                 disabled={isLoggingOut}
+                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-wait"
+               >
+                 {isLoggingOut ? (
+                    <svg className="animate-spin h-4 w-4 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                 ) : (
+                    <ArrowRightOnRectangleIcon className="h-4 w-4" /> 
+                 )}
+                 {isLoggingOut ? "Logging out..." : "Logout"}
                </button>
              </div>
           </div>

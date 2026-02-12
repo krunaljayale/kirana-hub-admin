@@ -7,9 +7,8 @@ import {
   UserCircleIcon, BuildingStorefrontIcon, BellIcon, ShieldCheckIcon, 
   PhotoIcon, ArrowLeftOnRectangleIcon, CheckBadgeIcon, MoonIcon, 
   SunIcon, ComputerDesktopIcon, LanguageIcon, PhoneIcon, EnvelopeIcon, 
-  MapPinIcon, QuestionMarkCircleIcon
+  MapPinIcon
 } from "@heroicons/react/24/outline";
-import { motion } from "motion/react";
 
 // --- TOGGLE COMPONENT ---
 interface ToggleProps {
@@ -26,7 +25,6 @@ function Toggle({ label, desc, isOn, onToggle, colorType }: ToggleProps) {
   if (colorType === "orange") activeClass = "bg-orange-500";
 
   return (
-
     <div className="flex items-center justify-between py-2 cursor-pointer group" onClick={onToggle}>
       <div className="flex flex-col">
         <span className="text-sm font-bold text-slate-900 dark:text-white transition-colors duration-300">{label}</span>
@@ -93,12 +91,19 @@ export default function SettingsView() {
     }, 1500);
   };
 
-  const handleLogout = () => {
+  // ✅ UPDATED: REAL LOGOUT LOGIC
+  const handleLogout = async () => {
     setLogoutLoading(true);
-    setTimeout(() => {
+    try {
+      // 1. Call API to delete cookie
+      await fetch("/api/logout", { method: "POST" });
+      
+      // 2. Hard redirect to login
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed", error);
       setLogoutLoading(false);
-      router.push("/");
-    }, 1500);
+    }
   };
 
   const handleLogoClick = () => fileInputRef.current?.click();

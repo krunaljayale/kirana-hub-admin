@@ -1,26 +1,21 @@
-"use client"; 
-
 import "./globals.css";
-import { useState } from "react";
-import Sidebar from "@/components/layout/Sidebar"; 
-import Header from "@/components/layout/Header"; 
-import { usePathname } from "next/navigation"; 
-import { ThemeProvider } from "@/components/providers/ThemeProvider"; 
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
+// ✅ Metadata stays here
+export const metadata = {
+  title: "Kirana Hub",
+  description: "Admin Dashboard",
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname = usePathname(); 
-// Hide layout on Landing Page AND Login Page
-  const isFullScreen = pathname === "/" || pathname === "/login";
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* CRITICAL FIX: Now handles 'system' value correctly */}
+        {/* ✅ YOUR EXACT THEME SCRIPT - UNTOUCHED */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -45,28 +40,11 @@ export default function RootLayout({
         />
       </head>
       
-      {/* Body with smooth background transition */}
-      <body className={`flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden transition-colors duration-300 ease-in-out ${isFullScreen ? 'block' : 'flex'}`}>
-        
+      {/* ✅ BODY: Kept your background/transition classes. 
+          Removed 'flex' here to let the child layouts handle their own structure. */}
+      <body className="bg-transparent overflow-hidden transition-colors duration-300 ease-in-out text-slate-900 dark:text-slate-100">
         <ThemeProvider>
-          
-          {!isFullScreen && (
-            <Sidebar mobileOpen={sidebarOpen} setMobileOpen={setSidebarOpen} />
-          )}
-
-          {/* Main Content Wrapper */}
-          <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${!isFullScreen ? 'lg:ml-72' : ''}`}>
-            
-            {!isFullScreen && (
-              <Header onMenuClick={() => setSidebarOpen(true)} />
-            )}
-            
-            {/* Page Content */}
-            <main className={`bg-slate-50 dark:bg-slate-900 flex-1 transition-colors duration-300 ease-in-out ${!isFullScreen ? 'overflow-y-auto p-4 md:p-8' : 'overflow-auto'}`}>
-              {children}
-            </main>
-          </div>
-
+           {children}
         </ThemeProvider>
       </body>
     </html>

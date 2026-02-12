@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const { email, password } = body;
 
     // 1. Verify Credentials (Mock Database)
-    if (email === "admin@kiranahub.com" && password === "admin") {
+    if ((email === "admin@kiranahub.com" && password === "admin") || (email === "abhi@gmail.com" && password === "password")) {
       
       // 2. Prepare the Secret
       const secret = new TextEncoder().encode(

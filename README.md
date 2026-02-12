@@ -88,6 +88,6 @@ kirana-hub/
 
 - [x] Settings: Store profile, Toggle switches, Security. (Completed Today)
 
-- [ ] Backend: Integration with Supabase/Firebase for real database persistence.
+- [x] Auth: Clerk or NextAuth integration.
 
-- [ ] Auth: Clerk or NextAuth integration.
+- [ ] Backend: Integration with Supabase/Firebase for real database persistence.
