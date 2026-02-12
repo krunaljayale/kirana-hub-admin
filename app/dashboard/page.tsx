@@ -1,7 +1,7 @@
+"use client";
+
 import KpiCard from "@/components/ui/KpiCard";
 import SalesChart from "@/components/charts/SalesChart";
-import { motion } from "motion/react"
-
 import { 
   ShoppingBagIcon, 
   UsersIcon, 
@@ -72,13 +72,19 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         
         {/* Main Chart Area (Takes 2 columns) */}
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm lg:col-span-2 min-h-[300px]">
-          <h3 className="font-bold text-slate-900 dark:text-white">
-            Sales Statistics
-          </h3>
-          <div className="mt-8 flex h-64 items-center justify-center rounded-xl border-2 border-dashed border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500">
-            <SalesChart />
+        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm lg:col-span-2">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-slate-900 dark:text-white">
+              Sales Statistics
+            </h3>
+            <select className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs rounded-lg px-2 py-1 outline-none">
+              <option>This Week</option>
+              <option>Last Week</option>
+            </select>
           </div>
+          
+          {/* Chart Container - height is handled inside the component now */}
+          <SalesChart />
         </div>
 
         {/* Delivery Partners Widget (Takes 1 column) */}
@@ -88,24 +94,30 @@ export default function DashboardPage() {
           </h3>
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer">
+              <div key={i} className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group">
                 <img 
                   src={`https://randomuser.me/api/portraits/men/${i + 30}.jpg`} 
                   alt="Driver" 
-                  className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-600"
+                  className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-600 group-hover:scale-105 transition-transform"
                 />
-                <div>
+                <div className="flex-1">
                   <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
                     Raju Kumar
                   </h4>
                   <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     Available
                   </p>
+                </div>
+                <div className="text-xs font-bold text-slate-400 dark:text-slate-500">
+                  2m away
                 </div>
               </div>
             ))}
           </div>
+          <button className="w-full mt-6 py-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+            View All Drivers
+          </button>
         </div>
       </div>
     </div>

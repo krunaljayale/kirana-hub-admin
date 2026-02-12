@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { API_ROUTES } from "@/app/constants/api"; 
 import { 
   EnvelopeIcon, 
   LockClosedIcon, 
@@ -20,19 +22,41 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    setTimeout(() => {
-      if (formData.email && formData.password) {
+    try {
+      // 1. Call the API
+      // The API will automatically set the 'httpOnly' cookie on success
+      const response = await axios.post(API_ROUTES.AUTH.LOGIN, formData);
+      const { success, user, message } = response.data;
+
+      if (success) {
+        // 2. Optional: Store non-sensitive User Info for UI (Name/Avatar)
+        // We DO NOT store the token here anymore. It's in the cookie.
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+
+        // 3. Redirect to Dashboard
+        // The Middleware will now see the cookie and let us in.
         router.push("/dashboard");
+        router.refresh(); // Ensure the new cookie is recognized
       } else {
-         setError("Please enter your credentials.");
-         setIsLoading(false);
+        setError(message || "Login failed.");
       }
-    }, 1500);
+
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response) {
+        setError(err.response.data.message || "Invalid credentials.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,7 +82,7 @@ export default function LoginPage() {
             Please enter your details to sign in.
           </p>
 
-          {/* Error Message */}
+          {/* Error Message Alert */}
           {error && (
             <div className="flex items-center gap-3 p-4 mb-6 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium animate-in slide-in-from-top-2">
               <ExclamationCircleIcon className="h-5 w-5 shrink-0" />
@@ -68,15 +92,18 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-5">
             
-            {/* Email */}
+            {/* Email Input */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider ml-1">Email</label>
+              <label htmlFor="email" className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider ml-1">Email</label>
               <div className="relative group">
                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                    <EnvelopeIcon className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                  </div>
                  <input 
+                   id="email"
+                   name="email"
                    type="email" 
+                   autoComplete="email"
                    value={formData.email}
                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                    className="block w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-[#18181b] border border-slate-200 dark:border-zinc-800 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium"
@@ -86,15 +113,18 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Password Input */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider ml-1">Password</label>
+              <label htmlFor="password" className="text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider ml-1">Password</label>
               <div className="relative group">
                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                    <LockClosedIcon className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                  </div>
                  <input 
+                   id="password"
+                   name="password"
                    type={showPassword ? "text" : "password"} 
+                   autoComplete="current-password"
                    value={formData.password}
                    onChange={(e) => setFormData({...formData, password: e.target.value})}
                    className="block w-full pl-12 pr-12 py-4 bg-slate-50 dark:bg-[#18181b] border border-slate-200 dark:border-zinc-800 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-medium"
@@ -111,7 +141,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Options */}
+            {/* Options Row */}
             <div className="flex items-center justify-between pt-1">
                <label className="flex items-center gap-3 cursor-pointer group">
                   <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${rememberMe ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800'}`}>
@@ -163,7 +193,6 @@ export default function LoginPage() {
       <div className="hidden lg:block lg:w-1/2 relative bg-white dark:bg-[#09090b] overflow-hidden">
          
          {/* Internal Image Container with Unique Curve */}
-         {/* This keeps the cool shape but inside a full-screen layout */}
          <div className="absolute top-4 right-4 bottom-4 left-0 rounded-[40px] overflow-hidden shadow-2xl">
             <img 
               src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2670&auto=format&fit=crop" 
