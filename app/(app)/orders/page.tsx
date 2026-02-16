@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OrdersTable from "@/components/orders/OrdersTable";
 import { 
   Squares2X2Icon, 
@@ -12,6 +12,7 @@ import {
   XCircleIcon,
   CheckBadgeIcon
 } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 // --- Types ---
 type OrderStatus = "Pending" | "Preparing" | "Ready";
@@ -23,7 +24,7 @@ interface OrderItem {
 }
 
 interface Order {
-  id: string;
+  id: string | number; // ✅ Allow both string and number to prevent TypeErrors
   customer: string;
   location: string;
   timeAgo: string;
@@ -33,89 +34,49 @@ interface Order {
   items: OrderItem[];
 }
 
-// --- Mock Data ---
-const mockOrders: Order[] = [
-  {
-    id: "ORD-001",
-    customer: "Rahul Sharma",
-    location: "1.2 km • Civil Lines",
-    timeAgo: "2 min ago",
-    status: "Pending",
-    payment: "COD",
-    total: 160,
-    items: [
-      { name: "Amul Milk 500ml", qty: 2, price: 30 },
-      { name: "Modern Bread", qty: 1, price: 40 },
-      { name: "Eggs (6pcs)", qty: 1, price: 60 },
-    ]
-  },
-  {
-    id: "ORD-004",
-    customer: "Sneha Patil",
-    location: "3.5 km • Market Yard",
-    timeAgo: "5 min ago",
-    status: "Pending",
-    payment: "UPI",
-    total: 480,
-    items: [
-      { name: "Maggi 6-Pack", qty: 2, price: 90 },
-      { name: "Kissan Ketchup", qty: 1, price: 140 },
-      { name: "Britannia Marie Gold", qty: 4, price: 40 },
-    ]
-  },
-  {
-    id: "ORD-005",
-    customer: "Vikram Malhotra",
-    location: "0.8 km • Station Road",
-    timeAgo: "8 min ago",
-    status: "Pending",
-    payment: "COD",
-    total: 2450,
-    items: [
-      { name: "Aashirvaad Atta 10kg", qty: 1, price: 450 },
-      { name: "Daawat Rice 5kg", qty: 1, price: 800 },
-      { name: "Fortune Oil 5L", qty: 1, price: 850 },
-      { name: "Tata Salt 1kg", qty: 2, price: 25 },
-      { name: "Toor Dal 1kg", qty: 2, price: 150 },
-    ]
-  },
-  {
-    id: "ORD-002",
-    customer: "Priya Singh",
-    location: "2.1 km • Gandhi Nagar",
-    timeAgo: "15 min ago",
-    status: "Preparing",
-    payment: "UPI",
-    total: 1250,
-    items: [
-      { name: "Fortune Oil 5L", qty: 1, price: 850 },
-      { name: "Basmati Rice 1kg", qty: 2, price: 200 },
-    ]
-  },
-  {
-    id: "ORD-003",
-    customer: "Amit Verma",
-    location: "Takeaway",
-    timeAgo: "45 min ago",
-    status: "Ready",
-    payment: "UPI",
-    total: 270,
-    items: [
-      { name: "Coke 2.25L", qty: 1, price: 90 },
-      { name: "Lays Chips", qty: 3, price: 20 },
-      { name: "Dairy Milk", qty: 1, price: 60 },
-    ]
-  }
-];
-
 export default function OrdersPage() {
   const [viewMode, setViewMode] = useState<"kanban" | "history">("kanban");
   const [statusFilter, setStatusFilter] = useState<OrderStatus>("Pending");
-  const [liveOrders, setLiveOrders] = useState(mockOrders);
+  
+  const [liveOrders, setLiveOrders] = useState<Order[]>([]); 
+  const [loading, setLoading] = useState(true);
 
-  const updateStatus = (id: string, newStatus: OrderStatus) => {
-    setLiveOrders(liveOrders.map(o => o.id === id ? { ...o, status: newStatus } : o));
-  };
+  // ✅ Axios Fetch Logic
+  useEffect(() => {
+    const fetchOrders = async () => {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`);
+  
+        setLiveOrders(response.data); // ✅ Axios stores data in .data
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  const updateStatus = async (id: string | number, newStatus: OrderStatus) => {
+      // 1. Snapshot the previous state (in case we need to revert)
+      const previousOrders = [...liveOrders];
+
+      // 2. Optimistic Update: Update the UI IMMEDIATELY ⚡
+      setLiveOrders(liveOrders.map(o => o.id === id ? { ...o, status: newStatus } : o));
+
+      try {
+        // 3. Send the API Request (This prepares you for the real backend)
+        // Note: We use the URL directly or the env variable
+        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`, { status: newStatus });
+        
+      } catch (error) {
+        console.error("Failed to update status on server:", error);
+        // 4. (Optional) If you want to be strict, you can revert the UI here:
+        // setLiveOrders(previousOrders); 
+        // But for a Mock Server that doesn't save, we usually ignore the error so the UI keeps working.
+      }
+    };
 
   const filteredOrders = liveOrders.filter(o => o.status === statusFilter);
 
@@ -127,6 +88,10 @@ export default function OrdersPage() {
     }
     return 'text-slate-500 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800';
   };
+
+  if (loading) {
+    return <div className="p-10 text-center text-slate-500">Loading orders...</div>;
+  }
 
   return (
     <div className="space-y-6 pb-20">
@@ -169,7 +134,7 @@ export default function OrdersPage() {
       {viewMode === "kanban" && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           
-          {/* --- STATUS BAR (Light/Dark Responsive) --- */}
+          {/* --- STATUS BAR --- */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="grid grid-cols-3 gap-1 md:flex md:gap-2">
               <button 
@@ -201,7 +166,7 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          {/* --- CARDS GRID (Light/Dark Responsive) --- */}
+          {/* --- CARDS GRID --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredOrders.length > 0 ? (
               filteredOrders.map((order) => (
@@ -211,7 +176,8 @@ export default function OrdersPage() {
                   <div className="flex justify-between items-start mb-5">
                     <div className="flex items-center gap-3">
                        <span className="h-10 w-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border border-orange-100 dark:border-orange-500/20 flex items-center justify-center font-bold text-sm">
-                          {order.id.split('-')[1]}
+                          {/* ✅ SAFE ID CHECK: Converts to string before checking .includes() */}
+                          {String(order.id).includes('-') ? String(order.id).split('-')[1] : order.id}
                        </span>
                        <div>
                           <h3 className="font-bold text-slate-900 dark:text-white text-base">Order #{order.id}</h3>
@@ -232,31 +198,31 @@ export default function OrdersPage() {
 
                   {/* Customer Info */}
                   <div className="mb-5 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex items-center gap-3 border border-slate-100 dark:border-slate-800">
-                     <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-sm">
-                        {order.customer.charAt(0)}
-                     </div>
-                     <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{order.customer}</p>
-                        <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                           <MapPinIcon className="h-3 w-3" />
-                           {order.location}
-                        </div>
-                     </div>
+                      <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-sm">
+                         {order.customer.charAt(0)}
+                      </div>
+                      <div>
+                         <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{order.customer}</p>
+                         <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                            <MapPinIcon className="h-3 w-3" />
+                            {order.location}
+                         </div>
+                      </div>
                   </div>
 
                   {/* Items List */}
                   <div className="space-y-3 mb-5 flex-1 bg-slate-50 dark:bg-slate-800/30 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-                     {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center text-sm">
-                           <div className="flex items-center gap-3">
-                              <span className="h-5 w-5 rounded flex items-center justify-center bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold border border-slate-200 dark:border-slate-700">
-                                 {item.qty}
-                              </span>
-                              <span className="text-slate-700 dark:text-slate-300 text-xs font-medium">{item.name}</span>
-                           </div>
-                           <span className="text-slate-900 dark:text-white font-bold text-xs">₹{item.price}</span>
-                        </div>
-                     ))}
+                      {order.items.map((item, idx) => (
+                         <div key={idx} className="flex justify-between items-center text-sm">
+                            <div className="flex items-center gap-3">
+                               <span className="h-5 w-5 rounded flex items-center justify-center bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold border border-slate-200 dark:border-slate-700">
+                                   {item.qty}
+                               </span>
+                               <span className="text-slate-700 dark:text-slate-300 text-xs font-medium">{item.name}</span>
+                            </div>
+                            <span className="text-slate-900 dark:text-white font-bold text-xs">₹{item.price}</span>
+                         </div>
+                      ))}
                   </div>
 
                   {/* Footer Actions */}
@@ -304,7 +270,7 @@ export default function OrdersPage() {
               ))
             ) : (
               <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-500">
-                 <p>No orders in {statusFilter}.</p>
+                  <p>No orders in {statusFilter}.</p>
               </div>
             )}
           </div>
