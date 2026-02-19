@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { MapPinIcon } from "@heroicons/react/24/solid"; // Using Heroicons for placeholder
+import { MapPinIcon } from "@heroicons/react/24/solid";
+
+// ✅ FIXED: Importing our strict type so IDs match (String instead of Number)
+import { Runner } from "@/types/delivery"; 
 
 // --- Fix Leaflet Default Icon Issue in Next.js ---
 const iconUrl = "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png";
@@ -23,14 +25,6 @@ const customIcon = new L.Icon({
 });
 
 // --- Types ---
-interface Runner {
-  id: number;
-  name: string;
-  lat: number;
-  lng: number;
-  status: string;
-}
-
 interface MapProps {
   runners: Runner[];
   isLoaded: boolean; // Simulating API load status
@@ -58,7 +52,7 @@ export default function TrackingMap({ runners, isLoaded }: MapProps) {
   return (
     <div className="w-full h-[500px] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm relative z-0">
       <MapContainer 
-        center={[18.5204, 73.8567]} // Default: Pune, India (Change to your city)
+        center={[18.5204, 73.8567]} // Default: Pune, India (Change to your city's coordinates if needed)
         zoom={13} 
         scrollWheelZoom={false} 
         style={{ height: "100%", width: "100%" }}

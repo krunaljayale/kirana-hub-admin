@@ -295,7 +295,7 @@ export default function ProfileView() {
                      <div key={log.id} className="relative flex gap-4 group">
                         {/* Connecting Line */}
                         {index !== ACTIVITY_LOGS.length - 1 && (
-                           <div className="absolute left-5 top-10 bottom-[-24px] w-0.5 bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors"></div>
+                           <div className="absolute left-5 top-10 -bottom-6 w-0.5 bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors"></div>
                         )}
                         
                         {/* Icon */}
