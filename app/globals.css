@@ -41,3 +41,93 @@ body {
   -o-transition: none !important;
   transition: none !important;
 }
+
+
+
+
+
+/* ==========================================
+   CUSTOM SCROLLBAR DESIGN
+   ========================================== */
+
+/* 1. Global Scrollbar (WebKit - Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;  /* Width of the vertical scrollbar */
+  height: 8px; /* Height of the horizontal scrollbar */
+}
+
+/* 2. Scrollbar Track (The background) */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+/* 3. Scrollbar Thumb (The draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* Tailwind slate-300 */
+  border-radius: 10px; /* Makes it nicely rounded */
+  border: 2px solid transparent; /* Creates padding around the thumb */
+  background-clip: padding-box;
+}
+
+/* 4. Scrollbar Thumb on Hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* Tailwind slate-400 */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ==========================================
+   DARK MODE SCROLLBAR SUPPORT
+   ========================================== */
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155; /* Tailwind slate-700 */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* Tailwind slate-600 */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ==========================================
+   FIREFOX SUPPORT (Standard CSS)
+   ========================================== */
+* {
+  scrollbar-width: thin; /* 'auto' or 'thin' */
+  scrollbar-color: #cbd5e1 transparent; /* thumb track */
+}
+
+.dark * {
+  scrollbar-color: #334155 transparent;
+}
+
+
+
+
+
+
+/* ==========================================
+   DYNAMIC PROGRESS BAR (LIGHT / DARK MODE)
+   ========================================== */
+
+/* ☀️ LIGHT MODE: Clean, Professional Indigo */
+#nprogress .bar {
+  background: linear-gradient(to right, #ec4899, #8b5cf6, #4f46e5) !important;
+}
+
+#nprogress .peg {
+  /* Subtle glow at the leading edge */
+  box-shadow: 0 0 10px #4f46e5, 0 0 5px #ec4899 !important;
+}
+
+/* 🌙 DARK MODE: Futuristic Glowing Gradient (Clarid Vibe) */
+.dark #nprogress .bar {
+  background: linear-gradient(to right, #4f46e5, #8b5cf6, #ec4899) !important;
+}
+
+.dark #nprogress .peg {
+  /* Vibrant pink/purple glow at the leading edge */
+  box-shadow: 0 0 10px #ec4899, 0 0 5px #4f46e5 !important;
+}

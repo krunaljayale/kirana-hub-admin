@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import NextTopLoader from 'nextjs-toploader'; // ✅ Added the loader import
 
 // ✅ Metadata stays here
 export const metadata = {
@@ -44,6 +45,19 @@ export default function RootLayout({
           Removed 'flex' here to let the child layouts handle their own structure. */}
       <body className="bg-transparent overflow-hidden transition-colors duration-300 ease-in-out text-slate-900 dark:text-slate-100">
         <ThemeProvider>
+           {/* ✅ ADDED: The sleek progress bar */}
+            <NextTopLoader 
+              color="transparent" /* CSS handles the color now! */
+              initialPosition={0.08} 
+              crawlSpeed={200} 
+              height={2} 
+              crawl={true} 
+              showSpinner={false} 
+              easing="ease" 
+              speed={200} 
+              shadow="none" /* CSS handles the shadow now! */
+            />
+          
            {children}
         </ThemeProvider>
       </body>

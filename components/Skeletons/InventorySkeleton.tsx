@@ -59,15 +59,15 @@ export default function InventorySkeleton() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50 dark:bg-slate-800/80 sticky top-0 z-10">
               <tr className="border-b border-slate-200 dark:border-slate-700">
-                <th className="p-4 pl-6"><div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
-                <th className="p-4"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
-                <th className="p-4"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
-                <th className="p-4"><div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
-                <th className="p-4"><div className="h-3 w-16 mx-auto bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
+                <th className="p-4 pl-6"><div className="h-[17.5px] w-20 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
+                <th className="p-4"><div className="h-[17.5px] w-24 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
+                <th className="p-4"><div className="h-[17.5px] w-16 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
+                <th className="p-4"><div className="h-[17.5px] w-20 bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
+                <th className="p-4"><div className="h-[17.5px] w-16 mx-auto bg-slate-200 dark:bg-slate-700 rounded-md"></div></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
-              {[1, 2, 3, 4].map((i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <tr key={i}>
                   
                   {/* Product Info (Image + Name + Unit) */}
