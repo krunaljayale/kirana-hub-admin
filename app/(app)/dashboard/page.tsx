@@ -1,124 +1,124 @@
 "use client";
 
-import KpiCard from "@/components/ui/KpiCard";
-import SalesChart from "@/components/charts/SalesChart";
-import { 
-  ShoppingBagIcon, 
-  UsersIcon, 
-  ArrowPathIcon, 
-  CheckCircleIcon 
-} from "@heroicons/react/24/solid";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+import DashboardSkeleton from "@/components/Skeletons/DashboardSkeleton";
+import TopStats from "@/components/modals/dashboard/TopStats";
+import LiveActivity from "@/components/modals/dashboard/LiveActivity";
+import DeliveryWidget from "@/components/modals/dashboard/DeliveryWidget";
+import SalesChart from "@/components/modals/dashboard/charts/SalesChart";
+import { DashboardStats, ChartData } from "@/types/dashboard";
+import { Runner } from "@/types/delivery";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function DashboardPage() {
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [runners, setRunners] = useState<Runner[]>([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      const minLoadTime = new Promise(resolve => setTimeout(resolve, 800));
+      
+      try {
+        setLoading(true);
+        // Fetch all required collections
+        const [_, ordersRes, productsRes, customersRes, runnersRes] = await Promise.all([
+          minLoadTime,
+          axios.get(`${API_URL}/orders`),
+          axios.get(`${API_URL}/products`),
+          axios.get(`${API_URL}/customers`),
+          axios.get(`${API_URL}/runners`)
+        ]);
+
+        const orders = ordersRes.data;
+        
+        // --- Calculate Dynamic Stats ---
+        const totalSales = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
+        const todaysOrdersList = orders.filter((o: any) => o.status === "Pending" || o.status === "Preparing" || o.status === "Ready");
+        const todaysRevenue = todaysOrdersList.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
+        const completedCount = orders.filter((o: any) => o.status === "Delivered").length;
+        
+        setStats({
+          totalSales,
+          totalProducts: productsRes.data.length,
+          activeCustomers: customersRes.data.length,
+          todaysOrders: todaysOrdersList.length,
+          todaysRevenue,
+          completedOrders: completedCount,
+          successRate: orders.length ? `${Math.round((completedCount / orders.length) * 100)}%` : "0%",
+          onlineUsers: Math.floor(Math.random() * 50) + 10, // Mocked live data
+          returningUsers: "13.3k" // Mocked historic metric
+        });
+
+        // --- Generate Chart Data ---
+        // Simulating a week of data based on the real total
+        const base = totalSales / 7 || 3000;
+        setChartData([
+          { name: 'Mon', sales: Math.round(base * 0.8) },
+          { name: 'Tue', sales: Math.round(base * 1.2) },
+          { name: 'Wed', sales: Math.round(base * 0.9) },
+          { name: 'Thu', sales: Math.round(base * 1.1) },
+          { name: 'Fri', sales: Math.round(base * 1.5) },
+          { name: 'Sat', sales: Math.round(base * 1.8) },
+          { name: 'Sun', sales: Math.round(base * 1.3) },
+        ]);
+
+        setRunners(runnersRes.data);
+
+      } catch (error) {
+        console.error("Failed to load dashboard", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading || !stats) return <DashboardSkeleton />;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-20">
       {/* 1. Page Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Dashboard Overview
           </h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             Welcome back, Admin 👋
           </p>
         </div>
       </div>
 
-      {/* 2. Top Stats (White Cards) */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <KpiCard title="Total Sales" value="₹84,920" subtext="+14% from last month" />
-        <KpiCard title="Total Products" value="124" subtext="In active inventory" />
-        <KpiCard title="Active Customers" value="1,240" subtext="+22 new this week" />
-      </div>
+      {/* 2. Top Stats */}
+      <TopStats stats={stats} />
 
-      {/* 3. Live Activity (Colorful Grid) */}
-      <div>
-        <h2 className="mb-4 text-lg font-bold text-slate-900 dark:text-white">
-          Live Activity
-        </h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard 
-            title="Today's Orders" 
-            value="24" 
-            subtext="₹14,920 Revenue" 
-            variant="pink" 
-            icon={<ShoppingBagIcon className="h-6 w-6" />}
-          />
-          <KpiCard 
-            title="Online Users" 
-            value="96" 
-            subtext="12 Ordering now" 
-            variant="blue" 
-            icon={<UsersIcon className="h-6 w-6" />}
-          />
-          <KpiCard 
-            title="Returning" 
-            value="13.3k" 
-            subtext="+14% Retention" 
-            variant="orange" 
-            icon={<ArrowPathIcon className="h-6 w-6" />}
-          />
-          <KpiCard 
-            title="Completed" 
-            value="981" 
-            subtext="98% Success Rate" 
-            variant="purple" 
-            icon={<CheckCircleIcon className="h-6 w-6" />}
-          />
-        </div>
-      </div>
+      {/* 3. Live Activity */}
+      <LiveActivity stats={stats} />
 
-      {/* 4. Bottom Section (Charts & Delivery) */}
+      {/* 4. Bottom Section */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        
-        {/* Main Chart Area (Takes 2 columns) */}
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm lg:col-span-2">
+        {/* Chart Area */}
+        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm lg:col-span-2 flex flex-col">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-slate-900 dark:text-white">
-              Sales Statistics
-            </h3>
-            <select className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs rounded-lg px-2 py-1 outline-none">
+            <h3 className="font-bold text-slate-900 dark:text-white">Sales Statistics</h3>
+            <select className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg px-3 py-1.5 outline-none cursor-pointer">
               <option>This Week</option>
               <option>Last Week</option>
             </select>
           </div>
-          
-          {/* Chart Container - height is handled inside the component now */}
-          <SalesChart />
+          <div className="flex-1">
+             <SalesChart data={chartData} />
+          </div>
         </div>
 
-        {/* Delivery Partners Widget (Takes 1 column) */}
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-          <h3 className="font-bold text-slate-900 dark:text-white mb-4">
-            Delivery Partners
-          </h3>
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                <img 
-                  src={`https://randomuser.me/api/portraits/men/${i + 30}.jpg`} 
-                  alt="Driver" 
-                  className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-600 group-hover:scale-105 transition-transform"
-                />
-                <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
-                    Raju Kumar
-                  </h4>
-                  <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Available
-                  </p>
-                </div>
-                <div className="text-xs font-bold text-slate-400 dark:text-slate-500">
-                  2m away
-                </div>
-              </div>
-            ))}
-          </div>
-          <button className="w-full mt-6 py-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
-            View All Drivers
-          </button>
-        </div>
+        {/* Delivery Partners Widget */}
+        <DeliveryWidget runners={runners} />
       </div>
     </div>
   );

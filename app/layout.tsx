@@ -54,7 +54,7 @@ export default function RootLayout({
               crawl={true} 
               showSpinner={false} 
               easing="ease" 
-              speed={200} 
+              speed={200}
               shadow="none" /* CSS handles the shadow now! */
             />
           

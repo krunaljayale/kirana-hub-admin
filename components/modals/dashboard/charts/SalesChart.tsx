@@ -1,25 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react"; // 1. Import hooks
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
-
-const data = [
-  { name: 'Mon', sales: 4000 },
-  { name: 'Tue', sales: 3000 },
-  { name: 'Wed', sales: 5000 },
-  { name: 'Thu', sales: 2780 },
-  { name: 'Fri', sales: 1890 },
-  { name: 'Sat', sales: 6390 },
-  { name: 'Sun', sales: 3490 },
-];
+import { useEffect, useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartData } from "@/types/dashboard";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -33,17 +16,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     );
   }
   return null;
-};
+}
 
-export default function SalesChart() {
-  // 2. Add Mounted State
+export default function SalesChart({ data }: { data: ChartData[] }) {
   const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // 3. Prevent SSR rendering (Fixes the height -1 error)
   if (!mounted) return <div className="h-[300px] w-full bg-slate-50 dark:bg-slate-800/50 rounded-xl animate-pulse" />;
 
   return (
@@ -56,35 +34,11 @@ export default function SalesChart() {
               <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:opacity-10" />
-          
-          <XAxis 
-            dataKey="name" 
-            axisLine={false} 
-            tickLine={false} 
-            tick={{ fill: '#94a3b8', fontSize: 12 }} 
-            dy={10}
-          />
-          
-          <YAxis 
-            axisLine={false} 
-            tickLine={false} 
-            tick={{ fill: '#94a3b8', fontSize: 12 }} 
-            tickFormatter={(value) => `₹${value / 1000}k`}
-          />
-          
+          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} tickFormatter={(value) => `₹${value / 1000}k`} />
           <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#6366f1', strokeWidth: 2 }} />
-          
-          <Area 
-            type="monotone" 
-            dataKey="sales" 
-            stroke="#6366f1" 
-            strokeWidth={3}
-            fillOpacity={1} 
-            fill="url(#colorSales)" 
-            animationDuration={1500}
-          />
+          <Area type="monotone" dataKey="sales" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" animationDuration={1500} />
         </AreaChart>
       </ResponsiveContainer>
     </div>

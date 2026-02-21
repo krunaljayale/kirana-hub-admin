@@ -1,8 +1,8 @@
 "use client"; 
 
 import { useState } from "react";
-import Sidebar from "@/components/layout/Sidebar"; 
-import Header from "@/components/layout/Header"; 
+import Sidebar from "@/components/layout/sidebar/Sidebar"; 
+import Header from "@/components/layout/header/Header"; 
 // Note: No need for usePathname or isFullScreen checks anymore!
 
 export default function AdminLayout({

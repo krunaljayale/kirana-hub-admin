@@ -6,6 +6,8 @@ import { ShieldCheckIcon, ArrowLeftOnRectangleIcon, CheckBadgeIcon, ExclamationT
 
 import { SettingsData, StoreSettings, NotificationToggles } from "@/types/settings";
 import SettingsSkeleton from "@/components/Skeletons/SettingsSkeleton";
+
+// Note: Ensure these paths match your actual folder structure!
 import StoreProfile from "@/components/modals/settings/StoreProfile";
 import NotificationSettings from "@/components/modals/settings/NotificationSettings";
 import PreferencesSettings from "@/components/modals/settings/PreferencesSettings";
@@ -21,7 +23,6 @@ export default function SettingsPage() {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   
-  // Track original vs current state to calculate "isDirty"
   const [originalStore, setOriginalStore] = useState<StoreSettings | null>(null);
   const [store, setStore] = useState<StoreSettings>({ name: "", owner: "", phone: "", address: "", email: "", isOpen: true, logo: null });
   const [toggles, setToggles] = useState<NotificationToggles>({ orderAlerts: true, stockAlerts: true, whatsappUpdates: false });
@@ -32,7 +33,9 @@ export default function SettingsPage() {
     setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
   };
 
-  // --- FETCH SETTINGS ---
+  const isDirty = JSON.stringify(store) !== JSON.stringify(originalStore);
+
+  // --- FETCH SETTINGS & LISTEN FOR NAV TOGGLE ---
   useEffect(() => {
     const fetchSettings = async () => {
       const minLoadTime = new Promise(resolve => setTimeout(resolve, 800));
@@ -41,7 +44,7 @@ export default function SettingsPage() {
         const [_, res] = await Promise.all([minLoadTime, axios.get(`${API_URL}/settings`)]);
         if (res.data) {
           setStore(res.data.store);
-          setOriginalStore(res.data.store); // Keep a baseline copy
+          setOriginalStore(res.data.store); 
           setToggles(res.data.toggles);
         }
       } catch (err) {
@@ -51,45 +54,48 @@ export default function SettingsPage() {
       }
     };
     fetchSettings();
+
+    // Listen for changes from the Navbar Toggle
+    const handleSync = (e: CustomEvent) => {
+      setStore(prev => ({ ...prev, isOpen: e.detail }));
+      setOriginalStore(prev => prev ? { ...prev, isOpen: e.detail } : null);
+    };
+    window.addEventListener('sync-store-status', handleSync as EventListener);
+    
+    return () => window.removeEventListener('sync-store-status', handleSync as EventListener);
   }, []);
 
-  // Check if store details (ignoring isOpen) have changed
-  const isDirty = !!originalStore && (
-    store.name !== originalStore.name ||
-    store.owner !== originalStore.owner ||
-    store.phone !== originalStore.phone ||
-    store.address !== originalStore.address ||
-    store.email !== originalStore.email ||
-    store.logo !== originalStore.logo
-  );
-
   // --- ACTIONS ---
-  
-  // 1. Instant Save: Notification Toggles
-  const handleToggle = async (key: keyof NotificationToggles) => {
-    const updatedToggles = { ...toggles, [key]: !toggles[key] };
-    setToggles(updatedToggles); // Optimistic UI
-    try {
-      await axios.patch(`${API_URL}/settings`, { toggles: updatedToggles });
-    } catch (e) {
-      setToggles(toggles); // Revert on failure
-      showToast("Failed to save preference", "error");
-    }
-  };
 
-  // 2. Instant Save: Shop Status (Open/Closed)
+  // 1. Instant Save: Shop Status (Open/Closed)
   const handleToggleStatus = async () => {
     const updatedStore = { ...store, isOpen: !store.isOpen };
     setStore(updatedStore);
-    // Keep original in sync so changing status doesn't trigger the "Save Changes" button
     setOriginalStore(prev => prev ? { ...prev, isOpen: updatedStore.isOpen } : null);
+
+    // Shout to the Navbar toggle to update instantly!
+    window.dispatchEvent(new CustomEvent('sync-store-status', { detail: updatedStore.isOpen }));
 
     try {
       await axios.patch(`${API_URL}/settings`, { store: updatedStore });
       showToast(`Store is now ${updatedStore.isOpen ? "OPEN" : "CLOSED"}`);
     } catch (e) {
-      setStore(store); // Revert
+      setStore(store); 
+      setOriginalStore(prev => prev ? { ...prev, isOpen: store.isOpen } : null);
+      window.dispatchEvent(new CustomEvent('sync-store-status', { detail: store.isOpen }));
       showToast("Failed to update status", "error");
+    }
+  };
+
+  // 2. Instant Save: Notification Toggles (FIXED)
+  const handleToggle = async (key: keyof NotificationToggles) => {
+    const updatedToggles = { ...toggles, [key]: !toggles[key] };
+    setToggles(updatedToggles); 
+    try {
+      await axios.patch(`${API_URL}/settings`, { toggles: updatedToggles });
+    } catch (e) {
+      setToggles(toggles); 
+      showToast("Failed to save preference", "error");
     }
   };
 
@@ -98,7 +104,7 @@ export default function SettingsPage() {
     setIsSaving(true);
     try {
       await axios.patch(`${API_URL}/settings`, { store });
-      setOriginalStore(store); // Update baseline to hide the button
+      setOriginalStore(store);
       showToast("Store details updated!");
     } catch (e) {
       showToast("Failed to save changes", "error");
@@ -107,6 +113,7 @@ export default function SettingsPage() {
     }
   };
 
+  // 4. Logo Upload
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setIsUploadingLogo(true);
@@ -126,6 +133,7 @@ export default function SettingsPage() {
     }
   };
 
+  // 5. Logout
   const handleLogout = async () => {
     setLogoutLoading(true);
     try {
