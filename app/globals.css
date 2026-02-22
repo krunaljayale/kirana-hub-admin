@@ -85,3 +85,35 @@
 .dark #nprogress .peg {
   box-shadow: 0 0 10px #ec4899, 0 0 5px #4f46e5 !important;
 }
+
+
+
+/* Disable default crossfade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* The old theme stays perfectly still underneath.
+  The new theme acts as an expanding circle on top! 
+*/
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+  /* Telegram's exact speed is usually around 0.5s - 0.6s */
+  animation: telegram-ripple 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* The Magic: Starts at 0px at the exact mouse click, grows to calculated max-radius */
+@keyframes telegram-ripple {
+  0% {
+    clip-path: circle(0px at var(--click-x, 50%) var(--click-y, 50%));
+  }
+  100% {
+    clip-path: circle(var(--click-r, 150vw) at var(--click-x, 50%) var(--click-y, 50%));
+  }
+}
