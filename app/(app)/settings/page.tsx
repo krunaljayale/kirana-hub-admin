@@ -182,22 +182,22 @@ export default function SettingsPage() {
                 isDirty={isDirty}
               />
               
-              {/* Security Card */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+              {/* 🚀 Security Card (Removed transition-all to stop fade conflicts) */}
+              <div className="bg-white dark:bg-slate-800/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700/60 shadow-sm dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_4px_20px_rgba(0,0,0,0.1)]">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2 tracking-tight">
                   <ShieldCheckIcon className="h-5 w-5 text-indigo-500" /> Security
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">New Password</label>
-                      <input type="password" placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-all duration-300" />
+                      <label className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">New Password</label>
+                      <input type="password" placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none focus:border-indigo-500  dark:border-slate-700/60 dark:bg-slate-900/50 dark:text-white dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] dark:focus:bg-slate-800/80" />
                   </div>
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Confirm Password</label>
-                      <input type="password" placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-all duration-300" />
+                      <label className="block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Confirm Password</label>
+                      <input type="password" placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none focus:border-indigo-500  dark:border-slate-700/60 dark:bg-slate-900/50 dark:text-white dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] dark:focus:bg-slate-800/80" />
                   </div>
                 </div>
-                <button onClick={() => showToast("Password update link sent!", "success")} className="mt-4 text-sm font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 transition-colors duration-300">Update Password</button>
+                <button onClick={() => showToast("Password update link sent!", "success")} className="mt-5 text-sm font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Update Password</button>
               </div>
             </div>
 
@@ -206,11 +206,15 @@ export default function SettingsPage() {
               <NotificationSettings toggles={toggles} onToggle={handleToggle} />
               <PreferencesSettings />
 
-              {/* Logout Card */}
-              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-3xl border border-red-100 dark:border-red-900/30 text-center transition-all duration-300">
+              {/* 🚀 Logout Card (Removed transition-all) */}
+              <div className="bg-red-50 p-6 rounded-3xl border border-red-100 text-center dark:bg-red-500/5 backdrop-blur-xl dark:border-red-500/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_4px_20px_rgba(0,0,0,0.1)]">
                 <h4 className="font-bold text-red-600 dark:text-red-400 mb-2">Sign Out</h4>
-                <p className="text-xs text-red-500/80 mb-4">Log out of your admin account on this device.</p>
-                <button onClick={handleLogout} disabled={logoutLoading} className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-500/20">
+                <p className="text-xs font-medium text-red-500/80 dark:text-red-400/60 mb-5">Log out of your admin account on this device.</p>
+                <button 
+                  onClick={handleLogout} 
+                  disabled={logoutLoading} 
+                  className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 active:scale-95 transition-transform dark:bg-gradient-to-b dark:from-red-500 dark:to-red-600 dark:hover:from-red-600 dark:hover:to-red-700 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_10px_rgba(239,68,68,0.2)]"
+                >
                     {logoutLoading ? <div className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin"></div> : <ArrowLeftOnRectangleIcon className="h-5 w-5" />}
                     {logoutLoading ? "Logging out..." : "Logout"}
                 </button>

@@ -20,7 +20,7 @@ export default function NotificationDropdown({ notifications, isOpen, onToggle, 
       {/* Trigger Button */}
       <button 
         onClick={onToggle}
-        className={`relative rounded-full p-2 transition-colors duration-300 outline-none ${isOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+        className={`relative rounded-full p-2 outline-none ${isOpen ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}
       >
         <BellIcon className="h-6 w-6" />
         {unreadCount > 0 && (
@@ -55,7 +55,7 @@ export default function NotificationDropdown({ notifications, isOpen, onToggle, 
                <div 
                  key={item.id} 
                  onClick={() => onClickItem(item)} 
-                 className={`relative p-4 border-b border-slate-50 dark:border-slate-700/50 cursor-pointer transition-colors duration-200 group ${item.read ? 'bg-white dark:bg-slate-800 opacity-70 hover:opacity-100' : 'bg-indigo-50/30 dark:bg-indigo-900/10 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                 className={`relative p-4 border-b border-slate-50 dark:border-slate-700/50 cursor-pointer transition-opacity duration-200 group ${item.read ? 'bg-white dark:bg-slate-800 opacity-70 hover:opacity-100' : 'bg-indigo-50/30 dark:bg-indigo-900/10 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                >
                  {!item.read && <span className="absolute top-4 right-4 h-2 w-2 rounded-full bg-indigo-500"></span>}
                  <div className="flex gap-3">
@@ -71,7 +71,7 @@ export default function NotificationDropdown({ notifications, isOpen, onToggle, 
                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{item.desc}</p>
                      <p className="text-[10px] font-bold text-slate-400 mt-2">{item.time}</p>
                    </div>
-                   <button onClick={(e) => onDelete(e, item.id)} className="absolute bottom-4 right-4 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all active:scale-95" title="Remove">
+                   <button onClick={(e) => onDelete(e, item.id)} className="absolute bottom-4 right-4 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-[opacity,transform] active:scale-95" title="Remove">
                      <XMarkIcon className="h-4 w-4" />
                    </button>
                  </div>
@@ -80,10 +80,10 @@ export default function NotificationDropdown({ notifications, isOpen, onToggle, 
            )}
         </div>
 
-        {/* Footer */}
+        {/* Footer (Swapped transition-all to transition-transform) */}
         {notifications.length > 0 && (
           <div className="p-3 bg-slate-50 dark:bg-slate-800/50 text-center border-t border-slate-100 dark:border-slate-700">
-            <button onClick={onMarkAllRead} disabled={unreadCount === 0} className={`text-xs font-bold flex items-center justify-center gap-1.5 w-full py-2 rounded-xl transition-all active:scale-95 ${unreadCount === 0 ? 'text-slate-400 cursor-not-allowed' : 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-600 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700'}`}>
+            <button onClick={onMarkAllRead} disabled={unreadCount === 0} className={`text-xs font-bold flex items-center justify-center gap-1.5 w-full py-2 rounded-xl transition-transform active:scale-95 ${unreadCount === 0 ? 'text-slate-400 cursor-not-allowed' : 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-600 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700'}`}>
               <CheckCircleIcon className="h-4 w-4" /> Mark all as read
             </button>
           </div>

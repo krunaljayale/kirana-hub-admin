@@ -28,7 +28,7 @@ export default function ProfileDropdown({ isOpen, onToggle, dropdownRef }: Props
       {/* ✅ Fixed Mobile Button UI */}
       <button 
         onClick={onToggle} 
-        className="flex items-center gap-2 sm:gap-3 cursor-pointer group outline-none sm:bg-slate-50 sm:dark:bg-slate-800/50 sm:p-1.5 sm:pr-3 rounded-full sm:border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
+        className="flex items-center gap-2 sm:gap-3 cursor-pointer group outline-none sm:bg-slate-50 sm:dark:bg-slate-800/50 sm:p-1.5 sm:pr-3 rounded-full sm:border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 transition-transform"
       >
         <img 
           src="https://randomuser.me/api/portraits/men/32.jpg"
@@ -49,19 +49,21 @@ export default function ProfileDropdown({ isOpen, onToggle, dropdownRef }: Props
         </div>
         
         <div className="p-2 space-y-1">
-          <Link href="/profile" onClick={onToggle} className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors">
+          {/* 🚀 Removed transition-colors */}
+          <Link href="/profile" onClick={onToggle} className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl">
             <UserCircleIcon className="h-5 w-5" /> Profile
           </Link>
-          <Link href="/settings" onClick={onToggle} className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors">
+          <Link href="/settings" onClick={onToggle} className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl">
             <Cog6ToothIcon className="h-5 w-5" /> Settings
           </Link>
         </div>
 
         <div className="p-2 border-t border-slate-100 dark:border-slate-700">
+          {/* 🚀 Removed transition-colors */}
           <button 
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors disabled:opacity-70 disabled:cursor-wait"
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl disabled:opacity-70 disabled:cursor-wait"
           >
             {isLoggingOut ? <div className="h-5 w-5 rounded-full border-2 border-red-200 border-t-red-600 animate-spin"></div> : <ArrowRightOnRectangleIcon className="h-5 w-5" />}
             {isLoggingOut ? "Logging out..." : "Logout"}

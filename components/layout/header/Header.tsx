@@ -84,15 +84,15 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
         sticky top-0 z-20 flex h-20 w-full items-center justify-between px-4 sm:px-6 
         bg-white/80 backdrop-blur-md dark:bg-slate-900/80
         border-b border-slate-200 dark:border-slate-800/60
-        transition-colors duration-300 ease-in-out
       "
     >
       
       {/* LEFT: Mobile Menu & Live Clock */}
       <div className="flex items-center gap-3 sm:gap-4">
+        {/* 🚀 Removed color transition */}
         <button 
           onClick={onMenuClick}
-          className="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-xl dark:text-slate-400 dark:hover:bg-slate-800 transition-colors duration-300"
+          className="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-xl dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <Bars3Icon className="h-6 w-6" />
         </button>
@@ -103,10 +103,10 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
       {/* RIGHT: Status, Notifications, Profile */}
       <div className="flex items-center gap-3 sm:gap-5">
         
-        {/* ✅ Store Status moved to the right */}
         <StoreStatusToggle />
 
-        <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700 transition-colors duration-300"></div>
+        {/* 🚀 Removed color transition */}
+        <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
         
         <NotificationDropdown 
           notifications={notifications}
@@ -121,7 +121,8 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
           onClickItem={handleNotificationClick}
         />
 
-        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 transition-colors duration-300"></div>
+        {/* 🚀 Removed color transition */}
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         <ProfileDropdown 
           isOpen={showProfileMenu}

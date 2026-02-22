@@ -21,7 +21,7 @@ export default function LiveClock() {
   };
 
   return (
-    <div className="hidden md:flex items-center gap-4 text-slate-600 dark:text-slate-300 transition-colors">
+    <div className="hidden md:flex items-center gap-4 text-slate-600 dark:text-slate-300">
       <div className="flex flex-col">
         <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
           {getGreeting()}, Admin

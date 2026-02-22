@@ -1,88 +1,127 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-type ThemeOption = 'light' | 'dark' | 'system';
+type Theme = "dark" | "light" | "system";
 
-interface ThemeContextType {
-  theme: ThemeOption;
-  setTheme: (theme: ThemeOption) => void;
-}
+type ThemeProviderProps = {
+  children: React.ReactNode;
+};
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+type ThemeProviderState = {
+  theme: Theme;
+  setTheme: (theme: Theme, e?: React.MouseEvent) => void;
+};
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeOption>('system');
-  const [mounted, setMounted] = useState(false);
+const initialState: ThemeProviderState = {
+  theme: "system",
+  setTheme: () => null,
+};
 
-  // 1. Initialize from LocalStorage on mount
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme, setThemeState] = useState<Theme>("system");
+
+  // 1. Initial Load
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as ThemeOption;
+    const savedTheme = localStorage.getItem("theme") as Theme | null;
     if (savedTheme) {
       setThemeState(savedTheme);
     }
-    setMounted(true);
   }, []);
 
-  // 2. The Global Logic (Syncs State with DOM)
+  // 2. 🚀 THE FIX: Real-Time OS Theme Listener
   useEffect(() => {
-    // Only run on client
-    if (!mounted) return;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const root = document.documentElement;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      // ONLY trigger if the user's preference is actually set to "system"
+      if (theme === "system") {
+        const applyTheme = () => {
+          const root = window.document.documentElement;
+          root.classList.remove("light", "dark");
+          root.classList.add(e.matches ? "dark" : "light");
+        };
 
-    const applyTheme = () => {
-      const isDark = 
-        theme === 'dark' || 
-        (theme === 'system' && mediaQuery.matches);
+        if (!('startViewTransition' in document)) {
+          applyTheme();
+          return;
+        }
 
-      if (isDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
+        // If the OS triggers the change, erupt the ripple from the center of the screen!
+        const x = window.innerWidth / 2;
+        const y = window.innerHeight / 2;
+        const endRadius = Math.hypot(window.innerWidth, window.innerHeight);
+
+        const root = document.documentElement;
+        root.style.setProperty('--click-x', `${x}px`);
+        root.style.setProperty('--click-y', `${y}px`);
+        root.style.setProperty('--click-r', `${endRadius}px`);
+
+        // @ts-ignore
+        document.startViewTransition(() => {
+          applyTheme();
+        });
       }
-      
-      localStorage.setItem('theme', theme);
     };
 
-    applyTheme();
+    // Attach the listener
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
 
-    // Listener for System changes
-    if (theme === 'system') {
-      mediaQuery.addEventListener('change', applyTheme);
-      return () => mediaQuery.removeEventListener('change', applyTheme);
-    }
-  }, [theme, mounted]);
+    // Cleanup listener on unmount
+    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
+  }, [theme]); // Re-run this effect if the user changes their theme state
 
-  // 3. The "Smooth Switch" Wrapper
-  // This ONLY runs when the user manually changes the theme.
-  const changeTheme = (newTheme: ThemeOption) => {
-    // A. Inject a temporary class to force smooth transitions on EVERYTHING
-    document.documentElement.classList.add('transition-colors', 'duration-300', 'ease-in-out');
-    
-    // B. Update the state (triggering the useEffect above)
+  // 3. Manual Click Handler
+  const setTheme = (newTheme: Theme, e?: React.MouseEvent) => {
     setThemeState(newTheme);
-    
-    // C. Clean up the transition class after the animation finishes
-    // This prevents "laggy" resizing later on
-    setTimeout(() => {
-      document.documentElement.classList.remove('transition-colors', 'duration-300', 'ease-in-out');
-    }, 300);
+    localStorage.setItem("theme", newTheme);
+
+    const applyTheme = () => {
+      const root = window.document.documentElement;
+      root.classList.remove("light", "dark");
+
+      if (newTheme === "system") {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        root.classList.add(systemTheme);
+        return;
+      }
+      root.classList.add(newTheme);
+    };
+
+    if (!('startViewTransition' in document)) {
+      applyTheme();
+      return;
+    }
+
+    const x = e ? e.clientX : window.innerWidth / 2;
+    const y = e ? e.clientY : window.innerHeight / 2;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const root = document.documentElement;
+    root.style.setProperty('--click-x', `${x}px`);
+    root.style.setProperty('--click-y', `${y}px`);
+    root.style.setProperty('--click-r', `${endRadius}px`);
+
+    // @ts-ignore
+    document.startViewTransition(() => {
+      applyTheme();
+    });
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: changeTheme }}>
+    <ThemeProviderContext.Provider value={{ theme, setTheme }}>
       {children}
-    </ThemeContext.Provider>
+    </ThemeProviderContext.Provider>
   );
 }
 
-// Custom Hook
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
   return context;
-}
+};

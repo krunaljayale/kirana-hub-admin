@@ -23,7 +23,7 @@ export default function StoreStatusToggle() {
     };
     fetchStatus();
 
-    // ✅ NEW: Listen for changes from the Settings page
+    // Listen for changes from the Settings page
     const handleSync = (e: CustomEvent) => setIsOpen(e.detail);
     window.addEventListener('sync-store-status', handleSync as EventListener);
     
@@ -36,7 +36,7 @@ export default function StoreStatusToggle() {
     // Optimistic UI Update
     setIsOpen(newState);
 
-    // ✅ NEW: Shout to the rest of the app (Settings page) to update instantly!
+    // Shout to the rest of the app (Settings page) to update instantly!
     window.dispatchEvent(new CustomEvent('sync-store-status', { detail: newState }));
 
     try {
@@ -65,20 +65,24 @@ export default function StoreStatusToggle() {
   return (
     <button
       onClick={handleToggle}
-      className={`group flex items-center gap-2.5 p-1 pr-3 sm:pr-4 rounded-full border transition-all duration-300 active:scale-95 shadow-sm outline-none
+      // 🚀 Swapped transition-all to transition-transform (keeps click scale, drops color fade)
+      className={`group flex items-center gap-2.5 p-1 pr-3 sm:pr-4 rounded-full border transition-transform duration-300 active:scale-95 shadow-sm outline-none
         ${isOpen 
           ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20" 
           : "bg-red-50 border-red-200 dark:bg-red-500/10 dark:border-red-500/20"
         }
       `}
     >
-      <div className={`relative w-10 h-6 rounded-full transition-colors duration-300 ease-in-out shrink-0 shadow-inner ${isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}>
-        <div className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out flex items-center justify-center ${isOpen ? 'translate-x-4' : 'translate-x-0'}`}>
+      {/* 🚀 Removed transition-colors */}
+      <div className={`relative w-10 h-6 rounded-full shrink-0 shadow-inner ${isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}>
+        {/* Kept transition-transform here because it physically slides the thumb! Added spring physics. */}
+        <div className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center ${isOpen ? 'translate-x-4' : 'translate-x-0'}`}>
           {isOpen && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>}
           <span className={`h-1.5 w-1.5 rounded-full ${isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
         </div>
       </div>
-      <span className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wide transition-colors ${isOpen ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
+      {/* 🚀 Removed transition-colors */}
+      <span className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wide ${isOpen ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
         {isOpen ? "Shop Open" : "Shop Closed"}
       </span>
     </button>

@@ -72,7 +72,7 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                     </td>
                     <td className="p-4 text-sm font-medium text-slate-600 dark:text-slate-400"><span className="inline-block px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs">{product.category}</span></td>
                     <td className="p-4 font-bold text-slate-900 dark:text-white">₹{product.price}</td>
-                    <td className="p-4"><div className="flex items-center gap-2"><span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase border ${status.color}`}>{status.label}</span><span className="text-xs font-medium text-slate-400">({product.stock})</span></div></td>
+                    <td className="p-4"><div className="flex items-center gap-2"><span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase border ${status.color}`}>{status.label}</span><span className="text-sm font-normal text-slate-800 dark:text-slate-200">({product.stock})</span></div></td>
                     <td className="p-4">
                       <div className="flex items-center justify-center gap-2">
                         <button onClick={() => onEdit(product)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all" title="Edit"><PencilSquareIcon className="h-5 w-5" /></button>

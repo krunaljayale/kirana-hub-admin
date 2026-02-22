@@ -1,11 +1,12 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import NextTopLoader from 'nextjs-toploader'; // ✅ Added the loader import
+import NextTopLoader from 'nextjs-toploader';
+import { Metadata } from "next";
 
-// ✅ Metadata stays here
-export const metadata = {
+export const metadata: Metadata = {
   title: "Kirana Hub",
   description: "Admin Dashboard",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
@@ -16,7 +17,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* ✅ YOUR EXACT THEME SCRIPT - UNTOUCHED */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -24,11 +24,6 @@ export default function RootLayout({
                 try {
                   var saved = localStorage.getItem('theme');
                   var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  
-                  // LOGIC FIX:
-                  // 1. If saved is 'dark' -> DARK
-                  // 2. If saved is 'system' AND OS is dark -> DARK
-                  // 3. If saved is null (first visit) AND OS is dark -> DARK
                   if (saved === 'dark' || ((saved === 'system' || !saved) && sys)) {
                     document.documentElement.classList.add('dark');
                   } else {
@@ -41,13 +36,11 @@ export default function RootLayout({
         />
       </head>
       
-      {/* ✅ BODY: Kept your background/transition classes. 
-          Removed 'flex' here to let the child layouts handle their own structure. */}
-      <body className="bg-transparent overflow-hidden transition-colors duration-300 ease-in-out text-slate-900 dark:text-slate-100">
+      {/* 🚀 UPGRADED: Added hard background colors and longer transition duration */}
+      <body className="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 antialiased overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-900 dark:selection:text-white">        
         <ThemeProvider>
-           {/* ✅ ADDED: The sleek progress bar */}
             <NextTopLoader 
-              color="transparent" /* CSS handles the color now! */
+              color="transparent" 
               initialPosition={0.08} 
               crawlSpeed={200} 
               height={2} 
@@ -55,10 +48,9 @@ export default function RootLayout({
               showSpinner={false} 
               easing="ease" 
               speed={200}
-              shadow="none" /* CSS handles the shadow now! */
+              shadow="none" 
             />
-          
-           {children}
+            {children}
         </ThemeProvider>
       </body>
     </html>
